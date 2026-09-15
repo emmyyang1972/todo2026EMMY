@@ -1,0 +1,21 @@
+create type public.project_status as enum ('not_started','active','paused','completed','archived');
+create type public.task_status as enum ('todo','in_progress','completed','cancelled','blocked');
+create type public.task_priority as enum ('critical','high','normal','low');
+
+create table public.profiles (id uuid primary key references auth.users(id) on delete cascade, email text not null, display_name text, avatar_url text, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table public.projects (id uuid primary key default gen_random_uuid(), owner_id uuid not null references public.profiles(id) on delete cascade, name text not null, description text, status public.project_status not null default 'not_started', due_date date, color text, is_inbox boolean not null default false, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create unique index projects_one_inbox on public.projects(owner_id) where is_inbox;
+create table public.tasks (id uuid primary key default gen_random_uuid(), owner_id uuid not null references public.profiles(id) on delete cascade, project_id uuid not null references public.projects(id) on delete restrict, parent_task_id uuid references public.tasks(id) on delete cascade, title text not null check (length(trim(title)) > 0), description text, status public.task_status not null default 'todo', priority public.task_priority not null default 'normal', due_at timestamptz, is_today_focus boolean not null default false, blocked_reason text, estimated_minutes integer check (estimated_minutes is null or estimated_minutes >= 0), external_url text, completed_at timestamptz, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table public.tags (id uuid primary key default gen_random_uuid(), owner_id uuid not null references public.profiles(id) on delete cascade, name text not null, color text, created_at timestamptz not null default now(), unique(owner_id,name));
+create table public.task_tags (task_id uuid not null references public.tasks(id) on delete cascade, tag_id uuid not null references public.tags(id) on delete cascade, primary key(task_id,tag_id));
+create index tasks_owner_project_status on public.tasks(owner_id,project_id,status); create index tasks_owner_due on public.tasks(owner_id,due_at); create index tasks_owner_focus on public.tasks(owner_id,is_today_focus);
+
+alter table public.profiles enable row level security; alter table public.projects enable row level security; alter table public.tasks enable row level security; alter table public.tags enable row level security; alter table public.task_tags enable row level security;
+create policy "own profile" on public.profiles for all using (id = auth.uid()) with check (id = auth.uid());
+create policy "own projects" on public.projects for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "own tasks" on public.tasks for all using (owner_id = auth.uid()) with check (owner_id = auth.uid() and exists (select 1 from public.projects p where p.id = project_id and p.owner_id = auth.uid()));
+create policy "own tags" on public.tags for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
+create policy "own task tags" on public.task_tags for all using (exists (select 1 from public.tasks t where t.id = task_id and t.owner_id = auth.uid())) with check (exists (select 1 from public.tasks t where t.id = task_id and t.owner_id = auth.uid()) and exists (select 1 from public.tags g where g.id = tag_id and g.owner_id = auth.uid()));
+
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path = public as $$ begin insert into public.profiles(id,email,display_name,avatar_url) values(new.id,new.email,coalesce(new.raw_user_meta_data->>'full_name',new.raw_user_meta_data->>'name'),new.raw_user_meta_data->>'avatar_url') on conflict (id) do nothing; insert into public.projects(owner_id,name,is_inbox) values(new.id,'收件匣',true) on conflict do nothing; return new; end; $$;
+create trigger on_auth_user_created after insert on auth.users for each row execute procedure public.handle_new_user();
