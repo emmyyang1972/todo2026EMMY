@@ -1,0 +1,19 @@
+/* Hospital blue theme: trustworthy, calm, warm, and professional. */
+:root {
+  --ink: #16324f !important;
+  --muted: #6b7c93 !important;
+  --line: #d9e4ee !important;
+  --cream: #f5f9fc !important;
+  --green: #176b87 !important;
+  --pale: #e8f1f7 !important;
+  --navy: #123b5d !important;
+  --blue: #176b87 !important;
+  --teal: #159a9c !important;
+  --sky: #edf6fa !important;
+  --orange-pale: #fff1e6 !important;
+}
+
+.esg-hero { background: linear-gradient(120deg, #ffffff, #eef6fa) !important; }
+.reflection { background: #f2f8fb !important; }
+.lesson-list button.selected { border-color: #b7dce4 !important; background: #eef8fa !important; }
+.key-points { background: #f0f9fa !important; }
