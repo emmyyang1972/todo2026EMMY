@@ -164,3 +164,13 @@
 - Cron 保留為每日資料更新：Supabase 文獻摘要、文獻明細、研究題目與 FocusDesk 任務。
 - 新增 migration 005 移除 `literature_digests.recipient` 與 `sent_at`。
 - `npx.cmd tsc --noEmit` 通過；production build 因 OneDrive Windows `spawn EPERM` 阻塞。
+
+### 醫院永續報告書學習模組
+
+- 參考 `C:\1ESG` 的 GRI 1／2／3、GRI 308 範例、醫院永續報告書與參考框架素材。
+- 新增 `/esg`：每日條文拆解、日期輪替、學習完成標記、醫院報告書與 GRI 對照表。
+- 新增 `lib/esg-learning.ts`：11 張第一版學習卡與 9 組醫院報告書對照資料，保留原始來源路徑。
+- 今日、文獻研究側邊欄新增 ESG 學習入口。
+- `npx.cmd tsc --noEmit` 通過；受限環境外 `npm.cmd run build` 通過，`/esg` route 已生成。
+- 未複製或改動 `C:\1ESG` 原始資料。
+- 完成學習進度以 `focusdesk.esg.completed` 保存於瀏覽器 localStorage。

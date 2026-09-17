@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, BookOpen, CalendarDays, CheckSquare, ExternalLink, FolderKanban, Inbox, Lightbulb, Search, Settings } from 'lucide-react'
+import { ArrowLeft, BookOpen, CalendarDays, CheckSquare, ClipboardCheck, ExternalLink, FolderKanban, Inbox, Lightbulb, Search, Settings } from 'lucide-react'
 import type { LiteraturePaper, ResearchIdea } from '../../lib/literature'
 
 type DailyRecord = { date: string; query: string; papers: LiteraturePaper[]; ideas: ResearchIdea[] }
 
 function Sidebar() {
-  return <aside className="sidebar"><div className="brand"><span className="brand-mark"><CheckSquare size={19} /></span><span>FocusDesk</span></div><p className="nav-title">研究工作空間</p><Link className="nav-item" href="/today"><CalendarDays size={17} /><span>今日</span></Link><Link className="nav-item active" href="/literature"><BookOpen size={17} /><span>文獻研究</span></Link><Link className="nav-item" href="/projects"><FolderKanban size={17} /><span>專案</span></Link><Link className="nav-item" href="/inbox"><Inbox size={17} /><span>收件匣</span></Link><div className="side-bottom"><Link className="nav-item" href="/settings"><Settings size={17} /><span>設定</span></Link></div></aside>
+  return <aside className="sidebar"><div className="brand"><span className="brand-mark"><CheckSquare size={19} /></span><span>FocusDesk</span></div><p className="nav-title">研究工作空間</p><Link className="nav-item" href="/today"><CalendarDays size={17} /><span>今日</span></Link><Link className="nav-item active" href="/literature"><BookOpen size={17} /><span>文獻研究</span></Link><Link className="nav-item" href="/esg"><ClipboardCheck size={17} /><span>ESG 學習</span></Link><Link className="nav-item" href="/projects"><FolderKanban size={17} /><span>專案</span></Link><Link className="nav-item" href="/inbox"><Inbox size={17} /><span>收件匣</span></Link><div className="side-bottom"><Link className="nav-item" href="/settings"><Settings size={17} /><span>設定</span></Link></div></aside>
 }
 
 export default function LiteraturePage() {
