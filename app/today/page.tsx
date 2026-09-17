@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { CheckSquare, CalendarDays, FolderKanban, Inbox, Settings, Search, Plus, ChevronRight, CircleAlert, BookOpen } from 'lucide-react'
 import { esgPapers, researchPapers } from '../../lib/research'
+import { buildResearchIdeas } from '../../lib/literature'
 
 type Task = { id: string; title: string; project: string; projectId: string; status: 'todo' | 'in_progress' | 'completed' | 'cancelled' | 'blocked'; priority: 'critical' | 'high' | 'normal' | 'low'; due?: string; dueBucket?: 'overdue' | 'today' | 'upcoming'; focus?: boolean; description?: string; externalUrl?: string; folder?: string; createdAt?: string }
 type ApiTask = { id: string; title: string; description?: string | null; external_url?: string | null; folder?: string | null; created_at?: string; status: Task['status']; priority: Task['priority']; due_at: string | null; is_today_focus: boolean; project_id: string; projects?: { name: string; is_inbox: boolean } | { name: string; is_inbox: boolean }[] }
@@ -62,7 +63,9 @@ export default function Today() {
         const allPapers = [...researchPapers, ...esgPapers]
         const papers = allPapers.filter(paper => !existingUrls.has(paper.url)).map((paper, index) => ({ id: `research-${today}-${index}`, title: paper.title, project: '收件匣', projectId: 'inbox', status: 'todo' as const, priority: 'normal' as const, description: paper.description, externalUrl: paper.url, folder: paper.folder, createdAt: today }))
         const dailyTasks = initial.slice(0, 2).filter(seed => !stored.some(task => task.id === seed.id))
-        const withDailyTask = [...dailyTasks, ...stored]
+        const ideas = buildResearchIdeas(esgPapers.map(paper => ({ pmid: paper.url.split('/').filter(Boolean).pop() ?? paper.title, title: paper.title, journal: 'ESG 醫療研究', year: today.slice(0, 4), abstract: paper.description, keyPoints: [paper.description], url: paper.url })))
+        const ideaTasks = ideas.slice(0, 3).map((idea, index) => ({ id: `daily-idea-${today}-${index}`, title: `研究題目建議：${idea.title}`, project: 'ESG 醫療', projectId: 'esg-research', status: 'todo' as const, priority: 'high' as const, due: '今天', dueBucket: 'today' as const, focus: true, description: `研究問題：${idea.question} 可能設計：${idea.design}`, folder: `研究題目建議-${today}`, createdAt: today })).filter(task => !stored.some(item => item.id === task.id))
+        const withDailyTask = [...ideaTasks, ...dailyTasks, ...stored]
         setTasks([...papers, ...withDailyTask])
         setLoading(false)
         return
