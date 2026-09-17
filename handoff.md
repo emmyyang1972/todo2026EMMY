@@ -57,3 +57,64 @@
 2. 執行完整 production build。
 3. 確認 `/inbox/esg` 的 10 篇摘要與日期分類。
 4. 如需要背景每日自動搜尋，再接 cron／排程服務。
+
+## 2026-09-15 開工進度
+
+- 已確認 `.env.local` 尚未設定，現階段維持 localStorage 開發模式。
+- 已清理 `.next` 並在受限環境外重新執行 production build，成功通過。
+- 已啟動 `http://localhost:3000`；核心頁面與 `/inbox`、`/inbox/esg`、`/login` 均 HTTP 200。
+- 已新增 `/settings` 頁面，補齊側邊欄原有連結，顯示目前本地開發模式與登入入口。
+- 新增頁面後 `npx.cmd tsc --noEmit`、`npm.cmd run build` 均通過，`/settings` HTTP 200。
+
+### 下一步
+
+1. 重新驗證 TypeScript、production build 與 `/settings` HTTP 200。
+2. 若要使用正式資料持久化，設定 `.env.local` 並套用 migration 001、002。
+3. 再決定是否把專案／Kanban 示範資料改為 Supabase CRUD。
+
+## 2026-09-15 Vercel 部署
+
+- 已以 Vercel CLI 建立並連結 `emmyyang/0914vb` 專案。
+- Production deployment 已 READY，別名為 `https://0914vb-ten.vercel.app`。
+- Vercel build 成功；已用 Vercel CLI 驗證 production `/settings` 可正常回傳頁面。
+- Vercel 已建立 `.vercel/project.json` 並將 `.vercel`、`.env*` 加入 `.gitignore`；目前尚未將本地修改 commit／push 到 GitHub。
+
+## 2026-09-15 法規文件搜尋開發
+
+- 新增 `supabase/migrations/003_regulatory_documents.sql`：法規文件、分段全文、全文搜尋 RPC、RLS 與 `regulatory-documents` 私有 bucket。
+- 新增 `app/regulations/page.tsx`、`app/api/regulations/route.ts` 與 signed URL 查看 API。
+- 新增 `scripts/import-regulations.mjs`，直接讀取 `C:\Users\vince\OneDrive\桌面\0914法規` 的 PDF／DOC，不把文件放入 repo。
+- 新增 `npm.cmd run import:regulations` 指令與 PDF／DOC 解析套件。
+- typecheck、production build 均通過；新增程式已部署到 `https://0914vb-ten.vercel.app`。
+- 尚未執行 migration 或文件匯入：Vercel 與本機目前沒有 Supabase URL／anon key／service-role key。
+
+### 下一步
+
+1. 提供或建立 Supabase 專案，取得 URL、anon key、service-role key。
+2. 在 Supabase SQL Editor 執行 migration 001～003。
+3. 將 URL／anon key 設到 Vercel `0914vb`，service-role key 只放本機。
+4. 執行 `npm.cmd run import:regulations -- "C:\Users\vince\OneDrive\桌面\0914法規"`。
+5. 登入 production 後測試 `/regulations` 搜尋與文件查看。
+
+## 2026-09-15 收工狀態
+
+### 已完成
+
+- 已部署最新程式到 `https://0914vb-ten.vercel.app`，Vercel production READY。
+- 已完成法規文件搜尋頁、搜尋 API、登入保護的 signed URL 查看 API。
+- 已完成 `003_regulatory_documents.sql` 與本機匯入器，來源為 `C:\Users\vince\OneDrive\桌面\0914法規`。
+- 已確認來源資料為 1 個 PDF 與 1 個 DOC，約 9.25 MB；沒有放入 repo，也尚未上傳。
+
+### 驗證與阻礙
+
+- `npx.cmd tsc --noEmit`、`npm.cmd run build`、Vercel cloud build：通過。
+- 匯入器在缺少 Supabase 金鑰時安全停止，未傳送文件。
+- `0914vb` 目前沒有 Supabase 環境變數，尚未執行 migration 或文件匯入。
+
+### 下一次開工
+
+1. 取得 Supabase URL、anon key 與 service-role key（service-role key 僅在本機使用）。
+2. 在 Supabase SQL Editor 執行 migrations 001～003。
+3. 將 URL／anon key 設定到 Vercel 專案 `0914vb`。
+4. 執行 `npm.cmd run import:regulations -- "C:\Users\vince\OneDrive\桌面\0914法規"`。
+5. 登入 production，測試文件搜尋、內容查看與權限隔離。

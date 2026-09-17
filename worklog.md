@@ -97,3 +97,61 @@
 - Supabase 使用者需執行 migration 002。
 - 目前沒有 `.env.local`，本地測試使用 localStorage。
 - 每日自動搜尋仍是開啟 `/today` 時觸發，尚未加入背景排程。
+
+## 2026-09-15｜開工
+
+### 本次完成
+
+- 讀取並確認 `handoff.md`、`worklog.md` 的交接狀態。
+- 確認 `.env.local` 不存在，故目前仍為 localStorage 開發模式。
+- 清理 `.next` 後重試 build；受限環境仍出現 `spawn EPERM`，改在受限環境外執行後 production build 成功。
+- 啟動 Next.js dev server，確認 `/`、`/today`、`/projects`、`/projects/demo`、`/inbox`、`/inbox/esg`、`/login` HTTP 200。
+- 新增 `app/settings/page.tsx`，補齊設定頁與側邊欄連結。
+
+### 驗證／待驗證
+
+- `npx.cmd tsc --noEmit`：通過。
+- `npm.cmd run build`：通過，已產生 13 個路由。
+- `/settings`：HTTP 200。
+
+### 下一步
+
+- 完成新增設定頁後的 typecheck、build 與路由檢查。
+- 若進入正式串接，設定 Supabase 環境變數並套用兩個 migration。
+
+## 2026-09-15｜Vercel 部署
+
+- Vercel CLI 登入 `emmyyang`，建立並連結專案 `0914vb`。
+- Production deployment：`https://0914vb-ten.vercel.app`，狀態 READY。
+- Vercel 雲端 build 成功，包含 13 個 Next.js routes。
+- 透過 `vercel curl` 驗證 production `/settings` 頁面可回傳 HTML。
+- 本地目前仍有未提交修改（`.gitignore`、`handoff.md`、`worklog.md`、`app/settings/`）；本次部署為目前工作區 snapshot，尚未 push GitHub。
+
+## 2026-09-15｜法規文件搜尋
+
+### 本次完成
+
+- 確認指定資料夾有 2 個文件（PDF、DOC），合計約 9.25 MB；沒有將它們複製到 repo。
+- 新增法規文件 migration、RLS、全文搜尋 RPC 與私有 Storage bucket 定義。
+- 新增 `/regulations` 搜尋頁、搜尋 API、登入保護的 signed URL 文件查看 API。
+- 新增本機匯入器與 `pdf-parse`、`word-extractor` 依賴。
+- `npx.cmd tsc --noEmit`：通過。
+- `npm.cmd run build`：通過。
+- 已部署到 `https://0914vb-ten.vercel.app`，Vercel build READY。
+
+### 阻礙
+
+- `0914vb` 尚無 Supabase 環境變數；匯入器已安全停止，沒有上傳任何公司文件。
+- 需要 Supabase URL、anon key 與本機專用 service-role key，才能執行 migration 與匯入。
+
+### 下一步
+
+- 完成 Supabase 專案與金鑰設定後，再執行 migration、匯入文件及 production 搜尋測試。
+
+## 2026-09-15｜收工
+
+- 完成法規搜尋功能程式碼、migration 與本機匯入器，並部署最新版本至 `https://0914vb-ten.vercel.app`。
+- 完成 typecheck、local production build 與 Vercel cloud build 驗證。
+- 確認 2 份公司文件仍只存在於 `C:\Users\vince\OneDrive\桌面\0914法規`，沒有進入 repo 或 Vercel deployment upload。
+- 目前阻礙是 `0914vb` 沒有 Supabase 環境變數；尚未建立 schema、私有 bucket 或匯入文件。
+- 下次從 Supabase 專案／金鑰設定開始，再執行 migration、匯入與 production 搜尋測試。
