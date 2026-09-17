@@ -155,3 +155,12 @@
 - 確認 2 份公司文件仍只存在於 `C:\Users\vince\OneDrive\桌面\0914法規`，沒有進入 repo 或 Vercel deployment upload。
 - 目前阻礙是 `0914vb` 沒有 Supabase 環境變數；尚未建立 schema、私有 bucket 或匯入文件。
 - 下次從 Supabase 專案／金鑰設定開始，再執行 migration、匯入與 production 搜尋測試。
+## 2026-09-17
+
+### 停用每日文獻寄信功能
+
+- 使用者要求取消寄信並重新製作每日文獻流程。
+- 已移除 Resend、email HTML、寄件者／收件者環境變數與寄信結果處理。
+- Cron 保留為每日資料更新：Supabase 文獻摘要、文獻明細、研究題目與 FocusDesk 任務。
+- 新增 migration 005 移除 `literature_digests.recipient` 與 `sent_at`。
+- `npx.cmd tsc --noEmit` 通過；production build 因 OneDrive Windows `spawn EPERM` 阻塞。

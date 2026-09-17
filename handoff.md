@@ -118,3 +118,24 @@
 3. 將 URL／anon key 設定到 Vercel 專案 `0914vb`。
 4. 執行 `npm.cmd run import:regulations -- "C:\Users\vince\OneDrive\桌面\0914法規"`。
 5. 登入 production，測試文件搜尋、內容查看與權限隔離。
+
+## 2026-09-17 停用每日文獻寄信
+
+### 已完成
+
+- 移除 `/api/cron/daily-literature` 的 Resend API 呼叫、寄件者／收件者設定與寄信成功／失敗流程。
+- 每日 Cron 現在只搜尋文獻、寫入 `literature_digests`、`literature_papers`、`literature_ideas`，並建立 FocusDesk 研究題目任務。
+- 移除 `.env.example` 的 `RESEND_API_KEY`、`LITERATURE_EMAIL_TO`、`LITERATURE_EMAIL_FROM`。
+- 新增 `supabase/migrations/005_remove_literature_email_metadata.sql`，移除舊的 `recipient` 與 `sent_at` 欄位。
+- README 已改為明確標示「只更新資料，不寄信」。
+
+### 驗證
+
+- `npx.cmd tsc --noEmit`：通過。
+- `npm.cmd run build`：受 Windows／OneDrive `spawn EPERM` 阻塞，尚未完成 production build 驗證。
+
+### 下一步
+
+1. 在 Supabase 執行 migration 005。
+2. 重新部署 Vercel。
+3. 使用 `CRON_SECRET` 呼叫 Cron endpoint，確認只回傳資料更新結果且不產生任何寄信請求。
